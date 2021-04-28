@@ -184,8 +184,6 @@ df_eng.to_csv('df_eng2.csv', sep='\t')
 
 
 # --------------------------------------------------------------------
-
-
 ### Sentiment Analysis on "local"
 start = time.time()
 
@@ -221,8 +219,6 @@ df_eng.to_csv("df_senti_local.csv", sep='\t')
 
 
 # --------------------------------------------------------------------
-
-
 ### Sentiment Analysis on "Spark"
 # Set Spark
 conf = SparkConf().setMaster("spark://10.10.20.53:7077").setAppName("sentiment_analy")
@@ -231,11 +227,12 @@ sqlContext = SQLContext(sc)
 
 
 # Create schema 
-schema = StructType([
-    StructField("linsting_id", IntegerType(), True),
+schema = StructType([ 
+    StructField("linsting_id", IntegerType(), True), 
     StructField("comments", StringType(), True)])
 
-df = sqlContext.read.format('com.databricks.spark.csv').options(header = 'true', inferschema = 'true').options(delimiter = '\t').schema(schema).load('df_eng.csv')
+df = sqlContext.read.format('com.databricks.spark.csv').options(header = 'true',
+                                                                inferschema = 'true').options(delimiter = '\t').schema(schema).load('df_eng.csv')
 
 
 # Turn into RDD
@@ -249,21 +246,26 @@ start = time.time()
 
 analyzer = SentimentIntensityAnalyzer()
 
+
 def negative_score(text):
     negative_value = analyzer.polarity_scores(text)['neg']
     return negative_value
+
 
 def neutral_score(text):
     neutral_value = analyzer.polarity_scores(text)['neu']
     return neutral_value
 
+
 def positive_score(text):
     positive_value = analyzer.polarity_scores(text)['pos']
     return positive_value
 
+
 def compound_score(text):
     compound_value = analyzer.polarity_scores(text)['compound']
     return compound_value
+
 
 def sentimentWordsFunct(x):
     senti_list = []
@@ -282,7 +284,10 @@ result = df2.map(sentimentWordsFunct)
 
 
 # Create schema2 for dataframe
-schema2 = StructType([StructField("neg", FloatType(), True)                      ,StructField("neu", FloatType(), True)                      ,StructField("pos", FloatType(), True)                      ,StructField("compound", FloatType(), True)])
+schema2 = StructType([StructField("neg", FloatType(), True), 
+                      StructField("neu", FloatType(), True), 
+                      StructField("pos", FloatType(), True), 
+                      StructField("compound", FloatType(), True)])
 
 
 # Turn to dataframe
@@ -303,8 +308,6 @@ print("time : {}".format(end - start))
 
 
 # --------------------------------------------------------------------
-
-
 # See sentiment reviews graph in Berlin
 fig, axes = plt.subplots(2, 2, figsize=(10, 8))
 
@@ -327,8 +330,6 @@ plt.show()
 
 
 # --------------------------------------------------------------------
-
-
 ### WordClouds
 def plot_wordcloud(wordcloud, language):
     plt.figure(figsize=(12, 10))
